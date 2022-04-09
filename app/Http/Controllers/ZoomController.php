@@ -6,11 +6,8 @@ use App\Jobs\HandleZoomWebhook;
 use App\Models\ZoomToken;
 use App\OAuth\Zoom\ZoomProvider;
 use Arr;
-use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Log;
 
 class ZoomController extends Controller
 {
@@ -26,15 +23,12 @@ class ZoomController extends Controller
         $authorizationUrl = $this->zoomProvider->getAuthorizationUrl();
 
         return redirect()->to($authorizationUrl);
-
-        // fopdl2satf2rnwroxtitow
-        // fOpDl2saTF2rNwRoXtITow
     }
 
     public function callback(Request $request): RedirectResponse
     {
         $token = $this->zoomProvider->getAccessToken('authorization_code', [
-            'code' => $request->get('code')
+            'code' => $request->get('code'),
         ]);
 
         $resourceOwner = $this->zoomProvider->getResourceOwner($token);
@@ -54,10 +48,8 @@ class ZoomController extends Controller
     public function presence(Request $request)
     {
         $data = $request->json()?->all() ?? [];
-        ray($data);
 
         if (Arr::get($data, 'event') === 'user.presence_status_updated') {
-            ray('dispatch');
             $this->dispatch(new HandleZoomWebhook($data));
         }
 
